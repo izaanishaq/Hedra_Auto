@@ -1,0 +1,18 @@
+[theme]
+# use the dark base styles as a starting point
+base = "dark"
+
+# make the page background black
+backgroundColor = "#000000"
+
+# a slightly lighter canvas behind cards/widgets
+secondaryBackgroundColor = "#111111"
+
+# your primary accent for buttons, sliders, etc.
+primaryColor = "#1E90FF"   # you can pick any hex
+
+# text in headers, body, etc.
+textColor = "#FFFFFF"
+
+# optional: monospaced or sans serif
+font = "sans serif"

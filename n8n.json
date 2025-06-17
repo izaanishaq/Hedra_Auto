@@ -1,0 +1,1729 @@
+{
+  "name": "Hedra_Auto",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        4900,
+        800
+      ],
+      "id": "fdeb2bfe-334a-4d3e-9846-baddbacc23e6",
+      "name": "Respond Video Status"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.hedra.com/web-app/public/generations/{{ $json.params.generationId }}/status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4660,
+        800
+      ],
+      "id": "754273fc-029e-47c7-b8cb-675418f44b79",
+      "name": "Check Video Status"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"video_generation_started\",\n  \"generation_id\": \"{{$json.generation_id}}\",\n  \"session_id\": \"{{$json.session_id}}\",\n  \"message\": \"Poll /webhook/video-status/{{$json.generation_id}} for updates.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        5080,
+        320
+      ],
+      "id": "94a54b35-bcc9-4de5-ae88-8bc3257a781b",
+      "name": "Respond Video Started"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hedra.com/web-app/public/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "video"
+            },
+            {
+              "name": "start_keyframe_id",
+              "value": "={{ $json.id_1 }}"
+            },
+            {
+              "name": "audio_id",
+              "value": "={{ $json.id_2 }}"
+            },
+            {
+              "name": "generated_video_inputs",
+              "value": "={{ { \"text_prompt\": $json.llm.videoPrompt, \"aspect_ratio\": \"9:16\", \"resolution\": \"720p\", \"duration_ms\": auto } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4580,
+        320
+      ],
+      "id": "fb96d327-278e-4b28-9f1c-a3b87f976f31",
+      "name": "Generate Video Hedra"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.hedra.com/web-app/public/assets/{{ $json.id }}/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3980,
+        540
+      ],
+      "id": "57786d4f-e917-4c9c-92b6-fb6eafd30ebd",
+      "name": "Upload Audio to Hedra"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hedra.com/web-app/public/assets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.user.session_id }}-audio.mp3"
+            },
+            {
+              "name": "type",
+              "value": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3420,
+        700
+      ],
+      "id": "109de3e4-511c-4d24-887a-46d1292213ea",
+      "name": "Create Hedra Audio Asset"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.hedra.com/web-app/public/assets/{{$json.id}}/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3940,
+        260
+      ],
+      "id": "1095f448-42bd-42af-9702-0c1de1e2bfc2",
+      "name": "Upload Image to Hedra"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hedra.com/web-app/public/assets",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ $json.user.session_id }}-image.png"
+            },
+            {
+              "name": "type",
+              "value": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3420,
+        120
+      ],
+      "id": "c16df98e-804f-427d-ba79-547e562480ff",
+      "name": "Create Hedra Image Asset"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.user.manual_mode }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "1422a38f-92de-4773-a58a-1a47661d8bc2"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3aec84a-6fcf-40dc-a2f7-39e5d5f5af13",
+      "name": "Check Manual Mode",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Webhook Trigger').item.json.body.session_id }}-uploaded-audio.mp3",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1k0G-cDpjl9VgzYtLNn76my9djR6iONuS",
+          "mode": "list",
+          "cachedResultName": "temp",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k0G-cDpjl9VgzYtLNn76my9djR6iONuS"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1420,
+        220
+      ],
+      "id": "2aeb9c94-ecea-4e83-9ade-90da67cdfa03",
+      "name": "Upload User Audio",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Edit Fields').item.json.user.session_id }}-audio.mp3",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1k0G-cDpjl9VgzYtLNn76my9djR6iONuS",
+          "mode": "list",
+          "cachedResultName": "temp",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k0G-cDpjl9VgzYtLNn76my9djR6iONuS"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1740,
+        0
+      ],
+      "id": "7ffb857c-b427-4c90-8375-7478ab2563a6",
+      "name": "Upload Audio to Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/{{ $('Edit Fields').item.json.user.voice_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_47b068cc20e46b199461017ae1ee540751517f615975d330"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.cleaned_script }}"
+            },
+            {
+              "name": "voice_settings",
+              "value": "={{ { \"stability\": $('Edit Fields').item.json.el.stability, \"similarity_boost\": $('Edit Fields').item.json.el.similarity_boost, \"style\": $('Edit Fields').item.json.el.style } }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        0
+      ],
+      "id": "5db3f42b-b986-49ba-905a-d437cc49c9c2",
+      "name": "Generate Audio ElevenLabs"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Preprocess script for ElevenLabs - remove emotion tags but keep everything else\nconst originalScript = $input.first().json.user.script;\n\n// Remove emotion tags like [happy], [sad], [angry], etc. but keep the rest\nconst cleanedScript = originalScript.replace(/\\[[^\\]]*\\]/g, '').trim();\n\nreturn {\n  \n  cleaned_script: cleanedScript\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        0
+      ],
+      "id": "53732393-425d-4c93-8f6c-0ae7a602aff6",
+      "name": "Preprocess Script"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.user.use_elevenlabs }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "f1bd3795-b5c4-484c-99b5-a64dde4af4d6"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4ae5cd6b-6a79-4b11-a778-d96b508b4b75",
+      "name": "Check Use ElevenLabs",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        300,
+        260
+      ],
+      "id": "937dd7f9-59ab-469f-87eb-132a45d52ce4",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "0Mrm1dnlvftN5sC5",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=SCRIPT\n{{ $json.user.script }}\n\n\nProvide in json format:\n\n{\n\t\"imagePrompt\": \"...\",\n\t\"videoPrompt\": \"...\"\n}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are given a script or dialogue under the heading SCRIPT. Analyze the SCRIPT and produce exactly two paragraphs as follows. Use only words, numbers, commas, and full stops. Avoid other punctuation such as colons, semicolons, parentheses, quotation marks, hyphens, question marks, or exclamation marks and also dont use names but generic terms like character etc.\n\nThe first paragraph is the image generation prompt. Begin the paragraph with the words Image generation prompt. In that paragraph derive the optimal pose the character would be in based on the SCRIPT. Ensure the reference image of the character is preserved exactly preserve all structure form and details and ensure the generated pose resembles exactly the actual reference character from the base image. The background and overall theme must be derived from the SCRIPT. Include relevant background elements atmosphere and props based on SCRIPT to avoid randomness. Ensure creativity and avoid generic output. Replace any sensitive words such as butts with alternative phrasing that conveys a similar meaning but avoids triggering filters. Ensure the character is looking into the camera. Keep the paragraph concise to the point. Break down details with clear phrases but remain in one paragraph.\n\nThe second paragraph is the video generation prompt. Begin the paragraph with the words Video generation prompt. In that paragraph analyze the motion and emotion implied by the SCRIPT. Exaggerate the motion and emotion so the character appears very expressive in the final video. Ensure the first frame uses the reference image preserve all structure form and details so the character remains consistent and resembles exactly the reference image throughout the video. Replace any sensitive words such as butts with alternative phrasing that conveys a similar meaning but avoids triggering filters. Keep the paragraph concise to the point. Break down details with clear phrases but remain in one paragraph.\n\nInsert the SCRIPT after the heading SCRIPT. Use the exact heading SCRIPT followed by the dialogue or script. For example SCRIPT This is an example dialogue of the character reacting with surprise and joy. Keep only commas and full stops. No other punctuation.\n\nProvide in json format:\n\n{\n\t\"imagePrompt\": \"...\",\n\t\"videoPrompt\": \"...\"\n}"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        320,
+        100
+      ],
+      "id": "c6093312-58d0-4918-827e-5583dc554afa",
+      "name": "Generate Prompts"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "image",
+        "name": "={{ $json.user.session_id }}-original-image.jpg",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1k0G-cDpjl9VgzYtLNn76my9djR6iONuS",
+          "mode": "list",
+          "cachedResultName": "temp",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k0G-cDpjl9VgzYtLNn76my9djR6iONuS"
+        },
+        "options": {}
+      },
+      "id": "6c596957-3c66-468e-9fed-8d676fd555bd",
+      "name": "Upload Original Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -360,
+        100
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hedra_auto",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ed760d27-afec-42de-bef2-faf24dad2354",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        100
+      ],
+      "webhookId": "dae5aab2-db93-450c-a659-6302a98cb18f"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f7f36f0-c458-4376-96ae-270872983dd7",
+              "name": "llm.imagePrompt",
+              "value": "={{ $json.output.imagePrompt }}",
+              "type": "string"
+            },
+            {
+              "id": "0832cdee-f440-4f1c-b78b-8ffe2f446d37",
+              "name": "llm.videoPrompt",
+              "value": "={{ $json.output.videoPrompt }}",
+              "type": "string"
+            },
+            {
+              "id": "715b9012-2d92-4cc3-a39f-6483a24443fa",
+              "name": "el",
+              "value": "={{ $('Edit Fields1').item.json.el }}",
+              "type": "object"
+            },
+            {
+              "id": "8ed5b3da-1f49-4c64-b6d0-68552a97cbe1",
+              "name": "gd",
+              "value": "={{ $('Edit Fields1').item.json.gd }}",
+              "type": "object"
+            },
+            {
+              "id": "2a07dc7f-57d4-49f9-9c3f-6b62a6fc9148",
+              "name": "user",
+              "value": "={{ $('Edit Fields1').item.json.user }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "options": {
+          "stripBinary": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        100
+      ],
+      "id": "4387d054-9151-4466-b6c0-0d3923caafb3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a4ee0dd8-dc46-4c2b-8cfc-067de7328f22",
+              "name": "gd.id_original_image",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8b5680de-0d39-4256-950a-e19c933fe4aa",
+              "name": "user",
+              "value": "={{ $('Edit Fields2').item.json.user }}",
+              "type": "object"
+            },
+            {
+              "id": "8f1450ad-d75b-4e09-a006-d42c70c02d3b",
+              "name": "el",
+              "value": "={{ $('Edit Fields2').item.json.el }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "options": {
+          "stripBinary": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -120,
+        100
+      ],
+      "id": "8f8f23b8-ec53-4880-a14a-8107671fcb43",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8873cbfd-8602-478a-9f45-051a5c390985",
+              "name": "user.manual_mode",
+              "value": "={{ $json.body.manual_mode }}",
+              "type": "string"
+            },
+            {
+              "id": "c538820d-32dd-4b9a-a7a1-dbac3b579867",
+              "name": "user.use_elevenlabs",
+              "value": "={{ $json.body.use_elevenlabs }}",
+              "type": "string"
+            },
+            {
+              "id": "a509673e-61ad-44ec-bc06-d33c3ccbc81d",
+              "name": "user.voice_id",
+              "value": "={{ $json.body.voice_id }}",
+              "type": "string"
+            },
+            {
+              "id": "813417c3-c271-4138-b014-ca62325ed471",
+              "name": "user.session_id",
+              "value": "={{ $json.body.session_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5e7a0266-6436-416f-b1b3-a1a549b92b81",
+              "name": "user.script",
+              "value": "={{ $json.body.script }}",
+              "type": "string"
+            },
+            {
+              "id": "ffccc8c9-81d4-4dc4-8785-d6aa9d30a67a",
+              "name": "el.stability",
+              "value": "={{ $json.body.stability }}",
+              "type": "string"
+            },
+            {
+              "id": "d661aff9-1d49-4b1f-b1cd-7a8c12a51271",
+              "name": "el.similarity_boost",
+              "value": "={{ $json.body.similarity_boost }}",
+              "type": "string"
+            },
+            {
+              "id": "c8070aa1-76aa-4da3-9851-b94afe076509",
+              "name": "el.style",
+              "value": "={{ $json.body.style }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "options": {
+          "stripBinary": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -620,
+        100
+      ],
+      "id": "da65b583-d077-479c-a3c2-e3d57f936e5a",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28a4fa4d-979c-49c3-b52c-32a7f6e5cf09",
+              "name": "gd.id_audio_el",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "835b55a9-0f90-4e49-b5b4-7896947518e6",
+              "name": "gd.id_original_image",
+              "value": "={{ $('Edit Fields').item.json.gd.id_original_image }}",
+              "type": "object"
+            },
+            {
+              "id": "99cec056-40d2-4329-b04b-b75ee351e644",
+              "name": "llm",
+              "value": "={{ $('Edit Fields').item.json.llm }}",
+              "type": "object"
+            },
+            {
+              "id": "56721350-265f-4626-ac83-f8a3cec88eff",
+              "name": "el",
+              "value": "={{ $('Edit Fields').item.json.el }}",
+              "type": "object"
+            },
+            {
+              "id": "a420bf8b-a6f4-4cf0-b6f8-d8f9a7ea36cb",
+              "name": "user",
+              "value": "={{ $('Edit Fields').item.json.user }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "options": {
+          "stripBinary": false,
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1960,
+        0
+      ],
+      "id": "b6986679-d753-43dc-a2d3-a9d49256110a",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.gd.id_original_image }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2380,
+        280
+      ],
+      "id": "9ddabe2b-5e47-4a9e-b213-4e9d27019bb0",
+      "name": "Download Base Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.segmind.com/v1/flux-kontext-pro",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "SG_b2464c3875e1e350"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "input_image",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "seed",
+              "value": "={{ Math.floor(Math.random() * 10000) }}"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.llm.imagePrompt }}"
+            },
+            {
+              "name": "aspect_ratio",
+              "value": "9:16"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2580,
+        280
+      ],
+      "id": "b694bf3e-448a-4e1b-9d04-b6a361c0ead5",
+      "name": "Generate Image"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Edit Fields').item.json.user.session_id }}-flux-image.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1k0G-cDpjl9VgzYtLNn76my9djR6iONuS",
+          "mode": "list",
+          "cachedResultName": "temp",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k0G-cDpjl9VgzYtLNn76my9djR6iONuS"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2760,
+        280
+      ],
+      "id": "aa055dbb-ecd6-4893-b3e7-cd05427d939f",
+      "name": "Upload Flux-Image to Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96446715-8769-493a-95b9-702b7894d4e5",
+              "name": "llm",
+              "value": "={{ $('Edit Fields3').item.json.llm }}",
+              "type": "object"
+            },
+            {
+              "id": "d8e24305-35e6-4dc6-a76c-cc030f60d2bc",
+              "name": "el",
+              "value": "={{ $('Edit Fields3').item.json.el }}",
+              "type": "object"
+            },
+            {
+              "id": "31a633a6-7464-4491-bbc2-c28a97934d97",
+              "name": "user",
+              "value": "={{ $('Edit Fields3').item.json.user }}",
+              "type": "object"
+            },
+            {
+              "id": "bde4f47f-c7aa-4f8d-80c0-d0c47d67f495",
+              "name": "gd.id_audio_el",
+              "value": "={{ $('Edit Fields3').item.json.gd.id_audio_el }}",
+              "type": "string"
+            },
+            {
+              "id": "73b96ef4-e6fd-49a8-850b-5e7713826c24",
+              "name": "gd.id_original_image",
+              "value": "={{ $('Edit Fields3').item.json.gd.id_original_image }}",
+              "type": "string"
+            },
+            {
+              "id": "4ddeb678-674e-4c56-bf04-02426f026047",
+              "name": "gd.id_flux_image",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "selected",
+        "options": {
+          "ignoreConversionErrors": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2940,
+        280
+      ],
+      "id": "1518ca09-0ae8-47a9-9c42-5f3c37ad81e4",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.gd.id_flux_image }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3140,
+        280
+      ],
+      "id": "7dd22a87-df3c-4a63-a4f9-484ba93c3d81",
+      "name": "Download Flux Image",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3700,
+        260
+      ],
+      "id": "c1f58b08-ff29-488e-be9a-028c5a8eb261",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.gd.id_audio_el }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3140,
+        520
+      ],
+      "id": "3c04ddc6-979c-4f71-b2e3-b1f344b0709f",
+      "name": "Download Audio",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3720,
+        540
+      ],
+      "id": "7eee6147-cc04-4a23-88ec-9b3ddcdba7c0",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "addSuffix"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4280,
+        320
+      ],
+      "id": "be59ce76-1670-4cdc-8d22-07c7fcade01e",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.segmind.com/v1/flux-kontext-pro",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "SG_b2464c3875e1e350"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "input_image",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "seed",
+              "value": "1001"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $('Generate Prompts').item.json.output.promptImage }}"
+            },
+            {
+              "name": "aspect_ratio",
+              "value": "match_input_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4800,
+        1220
+      ],
+      "id": "23b417b7-6049-4edc-b95c-f519af45082f",
+      "name": "Generate Image 1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        5040,
+        1240
+      ],
+      "id": "0b80bc9d-e89e-4724-93e6-82fe6f6a47f3",
+      "name": "Merge Generated Images",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Webhook Trigger').item.json.body.session_id }}-option-{{ $index + 1 }}.jpg",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1k0G-cDpjl9VgzYtLNn76my9djR6iONuS",
+          "mode": "list",
+          "cachedResultName": "temp",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1k0G-cDpjl9VgzYtLNn76my9djR6iONuS"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5260,
+        1240
+      ],
+      "id": "de0e8168-45b9-46e9-b0f3-0005b9650843",
+      "name": "Upload Generated Images",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ExcOlYsMSYYJsXTk",
+          "name": "Google Drive Wakhra"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare response for manual mode with images and audio\nconst sessionId = $('Webhook Trigger').item.json.body.session_id;\nconst manualMode = $('Webhook Trigger').item.json.body.manual_mode === 'true';\nconst images = [];\n\n// Get audio data - either from ElevenLabs or uploaded\nlet audioData;\nif ($('Merge Audio Paths').all().length > 0) {\n  // Find the audio file from the merged paths\n  const audioItems = $('Merge Audio Paths').all();\n  const audioItem = audioItems.find(item => item.json.id);\n  if (audioItem) {\n    audioData = {\n      id: audioItem.json.id,\n      url: `https://drive.google.com/uc?id=${audioItem.json.id}`,\n      name: audioItem.json.name\n    };\n  }\n}\n\n// Collect generated images\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  images.push({\n    id: item.json.id,\n    url: `https://drive.google.com/uc?id=${item.json.id}`,\n    name: item.json.name\n  });\n}\n\nreturn {\n  session_id: sessionId,\n  images: images,\n  audio: audioData,\n  manual_mode: manualMode,\n  ready: true,\n  timestamp: new Date().toISOString(),\n  image_prompt: $('Generate Prompts').item.json.output.promptImage,\n  video_prompt: $('Generate Prompts').item.json.output.promptVideo\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5480,
+        1240
+      ],
+      "id": "2769506f-79fe-44a5-810d-298198533e51",
+      "name": "Prepare Manual Response",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        5700,
+        1240
+      ],
+      "id": "b687222b-5327-4f30-a467-94b5d4979fe2",
+      "name": "Respond Manual Mode",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "select-image",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "83c40364-ae1b-4521-a6a0-9ecffb6e29da",
+      "name": "Select Image Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        4180,
+        1240
+      ],
+      "webhookId": "79c194c8-7a3a-4e8c-9833-8a9efc3af233",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process image selection and get data for video generation\nconst sessionId = $json.body.session_id;\nconst selectedImageId = $json.body.selected_image_id;\n\nreturn {\n  session_id: sessionId,\n  selected_image_id: selectedImageId,\n  audio_approved: true // In this flow, audio is automatically approved\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4440,
+        1240
+      ],
+      "id": "b34371c7-9468-4189-99e5-38d8480e0aa6",
+      "name": "Process Image Selection",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95da9138-8639-4153-8e44-7cd0a104c0d5",
+              "name": "generation_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "6370cc6b-072b-4cd2-b72e-ed982b89c7fe",
+              "name": "session_id",
+              "value": "={{ $('Merge2').item.json.user_3.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4860,
+        320
+      ],
+      "id": "01bb81be-dbab-4983-aec7-7f170fa3a10a",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"imagePrompt\": \"...\",\n\t\"videoPrompt\": \"...\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        320
+      ],
+      "id": "db80a476-fe27-42ad-b1cd-1eaad7374f57",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "path": "=/video-status/:generationId",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        4360,
+        800
+      ],
+      "id": "3addb7a1-5ad5-44c1-b625-90ffc5e708b4",
+      "name": "Webhook",
+      "webhookId": "beb4de26-dfc4-42b3-990d-3f1c197fe1d9"
+    }
+  ],
+  "pinData": {
+    "Webhook Trigger": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.izaan.space",
+            "user-agent": "python-requests/2.32.3",
+            "content-length": "88282",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "2400:adc5:42d:3000:1922:1f69:1f03:6efa",
+            "cf-ipcountry": "PK",
+            "cf-ray": "95138286dec28749-MRS",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "multipart/form-data; boundary=fd4356118dd08b723231ef10a436f420",
+            "x-forwarded-for": "162.158.22.124",
+            "x-forwarded-host": "n8n.izaan.space",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "df82053917e2",
+            "x-real-ip": "162.158.22.124"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "session_id": "5ab6e4e0-560e-495c-84bd-5088cb357b64",
+            "script": "[pleading] I never said I wouldn't pee on the carpet. And I didn't. [excited] That wasn't even me. You did it in your sleep last night.",
+            "manual_mode": "false",
+            "use_elevenlabs": "true",
+            "voice_id": "f2yUVfK5jdm78zlpcZ8C",
+            "stability": "0.5",
+            "similarity_boost": "0.5",
+            "style": "0.6"
+          },
+          "webhookUrl": "https://n8n.izaan.space/webhook/hedra_auto",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Original Image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Prompts",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Prompts": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Use ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Script",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload User Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Script": {
+      "main": [
+        [
+          {
+            "node": "Generate Audio ElevenLabs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Audio ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Upload Audio to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Audio to Drive": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload User Audio": {
+      "main": [
+        []
+      ]
+    },
+    "Check Manual Mode": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download Base Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image to Hedra": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Audio to Hedra": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Video Hedra": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Hedra Image Asset": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Hedra Audio Asset": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Check Video Status": {
+      "main": [
+        [
+          {
+            "node": "Respond Video Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Check Use ElevenLabs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Generate Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Upload Original Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Check Manual Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Base Image": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Flux-Image to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Flux-Image to Drive": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Download Flux Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download Audio",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Download Flux Image": {
+      "main": [
+        [
+          {
+            "node": "Create Hedra Image Asset",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Upload Image to Hedra",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio": {
+      "main": [
+        [
+          {
+            "node": "Create Hedra Audio Asset",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Upload Audio to Hedra",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Generate Video Hedra",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image 1": {
+      "main": [
+        [
+          {
+            "node": "Merge Generated Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Generated Images": {
+      "main": [
+        [
+          {
+            "node": "Upload Generated Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Generated Images": {
+      "main": [
+        [
+          {
+            "node": "Prepare Manual Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Manual Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Manual Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Image Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Image Selection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Respond Video Started",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Prompts",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Video Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f7428b6d-dd65-4a07-8260-7cf70af09d3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "73e3ee8905c7bf0ceb7f3bdc81bc8f9cac260cb785dd43f9799ffa7b75abfbfe"
+  },
+  "id": "dYe7NRteDEhBIEjP",
+  "tags": []
+}
