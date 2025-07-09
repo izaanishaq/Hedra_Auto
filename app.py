@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 # Set environment variables if not set (temporary solution)
 if not os.getenv('ELEVENLABS_API_KEY'):
-    os.environ['ELEVENLABS_API_KEY'] = 'sk_47b068cc20e46b199461017ae1ee540751517f615975d330'
+    os.environ['ELEVENLABS_API_KEY'] = ''
 if not os.getenv('N8N_BASE_URL'):
-    os.environ['N8N_BASE_URL'] = 'https://n8n.izaan.space/webhook-test'
+    os.environ['N8N_BASE_URL'] = 'https://n8n.i.space/webhook-test'
 
 def main():
     """Main Streamlit application"""
