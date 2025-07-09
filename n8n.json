@@ -24,7 +24,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             }
           ]
         },
@@ -63,7 +63,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             },
             {
               "name": "Content-Type",
@@ -112,7 +112,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             }
           ]
         },
@@ -147,7 +147,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             },
             {
               "name": "Content-Type",
@@ -188,7 +188,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             }
           ]
         },
@@ -223,7 +223,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_hedra_WMjdDO5T4H2KXNqkpuZ8JR9nKX9jJ41ebNJhLtfdmNGKOIXps88z2k7eWZzaeHjc"
+              "value": ""
             },
             {
               "name": "Content-Type",
@@ -362,7 +362,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "sk_47b068cc20e46b199461017ae1ee540751517f615975d330"
+              "value": ""
             },
             {
               "name": "Content-Type",
@@ -784,7 +784,7 @@
           "parameters": [
             {
               "name": "x-api-key",
-              "value": "SG_b2464c3875e1e350"
+              "value": ""
             }
           ]
         },
